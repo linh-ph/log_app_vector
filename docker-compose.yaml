@@ -2,13 +2,17 @@ version: "3.8"
 
 services:
   fastapi:
-    build: .
+    build:
+      context: ./app
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     volumes:
       - ./app:/app
     depends_on:
       - vector
+    networks:
+      - app_network
 
   clickhouse:
     image: clickhouse/clickhouse-server:latest
@@ -24,17 +28,27 @@ services:
       CLICKHOUSE_USER: admin
       CLICKHOUSE_PASSWORD: admin123
       CLICKHOUSE_DB: logs_db
+    networks:
+      - app_network
 
   vector:
-    image: timberio/vector:0.45.0-debian
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: vector
     volumes:
       - ./vector.toml:/etc/vector/vector.toml:ro
     ports:
-      - "8080:8080"
+      - "8686:8686"
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8686/health"]
+    #   interval: 10s
+    #   retries: 5
     depends_on:
       - clickhouse
     restart: always
+    networks:
+      - app_network
 
   grafana:
     image: grafana/grafana:latest
@@ -46,3 +60,9 @@ services:
       - clickhouse
     volumes:
       - ./grafana:/var/lib/grafana
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge

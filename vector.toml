@@ -1,7 +1,8 @@
 [sources.http_logs]
 type = "http"
-address = "0.0.0.0:8080"
-encoding.codec = "json"
+address = "0.0.0.0:8686"
+encoding = "json"
+headers=["*"]
 
 [sinks.clickhouse]
 type = "clickhouse"
@@ -9,5 +10,8 @@ inputs = ["http_logs"]
 endpoint = "http://clickhouse:8123"
 database = "logs_db"
 table = "logs"
-batch_size = 100
-encoding.codec = "json"
+auth.strategy="basic"
+auth.password="admin123"
+auth.user="admin"
+healthcheck.enabled=true
+skip_unknown_fields=true

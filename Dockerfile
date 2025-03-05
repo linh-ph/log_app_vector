@@ -1,17 +1,21 @@
-# Chọn image chính thức của Python
-FROM python:3.10-slim
+FROM debian:latest
 
-# Thiết lập thư mục làm việc trong container
-WORKDIR /app
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    net-tools
 
-# Sao chép requirements.txt vào container
-COPY requirements.txt .
+# Download and install Vector
+RUN curl -LO https://packages.timber.io/vector/latest/vector-aarch64-unknown-linux-gnu.tar.gz && \
+    tar -xzf vector-aarch64-unknown-linux-gnu.tar.gz && \
+    mv vector-aarch64-unknown-linux-gnu/bin/vector /usr/local/bin/vector && \
+    rm -rf vector-aarch64-unknown-linux-gnu vector-aarch64-unknown-linux-gnu.tar.gz
 
-# Cài đặt tất cả các thư viện cần thiết từ requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy the configuration file
+COPY vector.toml /etc/vector/vector.toml
 
-# Sao chép mã nguồn của ứng dụng vào container
-COPY ./app /app
+# Expose the necessary port
+EXPOSE 8686
 
-# Cấu hình FastAPI để chạy với Uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Set the entrypoint
+ENTRYPOINT ["/usr/local/bin/vector", "--config", "/etc/vector/vector.toml"]
