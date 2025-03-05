@@ -1,0 +1,13 @@
+[sources.http_logs]
+type = "http"
+address = "0.0.0.0:8080"
+encoding.codec = "json"
+
+[sinks.clickhouse]
+type = "clickhouse"
+inputs = ["http_logs"]
+endpoint = "http://clickhouse:8123"
+database = "logs_db"
+table = "logs"
+batch_size = 100
+encoding.codec = "json"

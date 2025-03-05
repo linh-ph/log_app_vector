@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  fastapi:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app
+    depends_on:
+      - vector
+      
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
+    restart: always
+    ports:
+      - "8123:8123"  # HTTP Interface (API)
+      - "9000:9000"  # Native Interface (Client)
+    volumes:
+      - ./clickhouse_data:/var/lib/clickhouse
+      - ./clickhouse-config.xml:/etc/clickhouse-server/config.xml
+    environment:
+      CLICKHOUSE_USER: admin
+      CLICKHOUSE_PASSWORD: admin123
+      CLICKHOUSE_DB: logs_db
+
+  vector:
+    image: timberio/vector:latest
+    container_name: vector
+    volumes:
+      - ./vector.toml:/etc/vector/vector.toml:ro
+    depends_on:
+      - clickhouse
+    restart: always
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - clickhouse
+    volumes:
+      - ./grafana:/var/lib/grafana
