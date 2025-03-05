@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.logger import logger, send_log
+from logger_config import logger, send_log
 
 app = FastAPI()
 

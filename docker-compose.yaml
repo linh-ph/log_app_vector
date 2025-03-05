@@ -9,7 +9,7 @@ services:
       - ./app:/app
     depends_on:
       - vector
-      
+
   clickhouse:
     image: clickhouse/clickhouse-server:latest
     container_name: clickhouse
@@ -19,17 +19,19 @@ services:
       - "9000:9000"  # Native Interface (Client)
     volumes:
       - ./clickhouse_data:/var/lib/clickhouse
-      - ./clickhouse-config.xml:/etc/clickhouse-server/config.xml
+      # - ./clickhouse-config.xml:/etc/clickhouse-server/config.xml
     environment:
       CLICKHOUSE_USER: admin
       CLICKHOUSE_PASSWORD: admin123
       CLICKHOUSE_DB: logs_db
 
   vector:
-    image: timberio/vector:latest
+    image: timberio/vector:0.45.0-debian
     container_name: vector
     volumes:
       - ./vector.toml:/etc/vector/vector.toml:ro
+    ports:
+      - "8080:8080"
     depends_on:
       - clickhouse
     restart: always

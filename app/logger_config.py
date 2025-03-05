@@ -25,6 +25,7 @@ def send_log(project, function, status, message):
         "message": message
     }
     try:
-        requests.post(VECTOR_ENDPOINT, json=log_data, timeout=2)
+        response = requests.post(VECTOR_ENDPOINT, json=log_data, timeout=2)
+        print("response", response)
     except requests.exceptions.RequestException as e:
         logger.error(f"Failed to send log: {e}")
