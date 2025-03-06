@@ -33,7 +33,7 @@ def create_table():
 
 @app.get("/")
 def read_root():
-    send_log("iot-system", "root", "info", "Root endpoint accessed")
+    send_log("iot-system", "root", "info", "Doooooo")
     return {"message": "Hello, FastAPI with Vector and ClickHouse!"}
 
 @app.get("/error")
@@ -68,3 +68,18 @@ def create():
 
     client.execute(insert_query)
     return {"message": "Log data inserted successfully"}
+
+#  {"accept":"*/*",
+#   "accept-encoding":"gzip, deflate",
+#   "connection":"keep-alive",
+#   "content-length":"100",
+#   "content-type":"application/json",
+#   "function":"root",
+#   "host":"vector:8686",
+#   "message":"Root endpoint accessed",
+#   "path":"/",
+#   "project":"iot-system",
+#   "source_type":"http_server",
+#   "status":"info",
+#   "timestamp":"2025-03-06T07:58:21.864126517Z",
+#   "user-agent":"python-requests/2.32.3"}

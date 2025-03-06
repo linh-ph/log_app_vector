@@ -1,12 +1,23 @@
 [sources.http_logs]
 type = "http"
 address = "0.0.0.0:8686"
-encoding = "json"
 headers=["*"]
+
+[transforms.parse_message]
+type = "remap"
+inputs = ["http_logs"]
+source = '''
+. = parse_json!(.message)
+'''
+
+[sinks.print]
+type = "console"
+inputs = ["parse_message"]
+encoding.codec = "json"
 
 [sinks.clickhouse]
 type = "clickhouse"
-inputs = ["http_logs"]
+inputs = ["parse_message"]
 endpoint = "http://clickhouse:8123"
 database = "logs_db"
 table = "logs"
@@ -15,3 +26,4 @@ auth.password="admin123"
 auth.user="admin"
 healthcheck.enabled=true
 skip_unknown_fields=true
+encoding.only_fields = ["project", "function", "status", "message", "timestamp"]
